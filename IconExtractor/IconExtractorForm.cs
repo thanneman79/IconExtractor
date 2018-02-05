@@ -49,10 +49,15 @@ namespace IconExtractor
 				labelInfo.Text = "No icons found in that file...";
 				timer.Interval = 7000D;
 				timer.Start();
-				return;
-			}
+                buttonExtractAll.Enabled = false;
+                return;
+            }
+            else
+            {
+                buttonExtractAll.Enabled = true;
+            }
 
-			foreach (Icon icon in iconExtractor.GetAll())
+            foreach (Icon icon in iconExtractor.GetAll())
 			{
 				pictureBoxes.Add(new PictureBox() { Image = icon.ToBitmap() });
 			}
@@ -109,5 +114,33 @@ namespace IconExtractor
 		{
 			iconExtractor.Dispose();
 		}
-	}
+
+        /// <summary>
+        /// Saves all icons loaded in the FlowControlPanel to the location specdied by the user in the folder browser dialog.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonExtractAll_Click(object sender, EventArgs e)
+        {
+            int index = 1;
+            string fileName = "";
+            string filePath = "";
+            FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
+
+            folderBrowser.ShowDialog();
+
+            foreach (Control flowLayoutPanelChild in flowLayoutPanel.Controls)
+            {
+                if (flowLayoutPanelChild.GetType() == typeof(PictureBox))
+                {
+                    fileName = String.Format("icon {0}.bmp", index.ToString("D4"));
+                    filePath = Path.Combine(folderBrowser.SelectedPath, fileName);
+                    ((PictureBox)flowLayoutPanelChild).Image.Save(filePath, System.Drawing.Imaging.ImageFormat.Bmp);
+                    index++;
+                }
+            }
+            labelInfo.Text = String.Format("Saved {0}", index, folderBrowser.SelectedPath);
+
+        }
+    }
 }
